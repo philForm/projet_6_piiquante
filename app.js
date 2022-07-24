@@ -1,13 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const path = require("path");
+
 const app = express();
 
 const dbPassword = process.env.DB_PASSWORD;
 const dbUser = process.env.DB_USER;
 
 const userRoutes = require("./routes/user");
+const sauceRoutes = require("./routes/sauce");
 
+// Se connecte à la Base de Données "piiquante" sur ATLAS et la crée si elle n'existe pas !
 // mongoose.connect(
 //     `mongodb+srv://${dbUser}:${dbPassword}@cluster0.jhxcq.mongodb.net/?retryWrites=true&w=majority`,
 //     { useNewUrlParser: true, useUnifiedTopology: true }
@@ -33,8 +37,10 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.use("/api/auth", userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
+app.use("/api/sauces", sauceRoutes);
+app.use("/api/auth", userRoutes);
 
 
 module.exports = app;
