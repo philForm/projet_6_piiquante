@@ -13,7 +13,7 @@ router.post("/", auth, multer, saucesControllers.createSauce);
 router.get("/", auth, saucesControllers.displayAllSauces);
 router.get("/:id", auth, saucesControllers.displayOneSauce);
 
-// router.post("/:id/like", auth, saucesControllers);
+router.post("/:id/like", auth, saucesControllers.likedSauce);
 
 router.put("/:id", auth, multer, saucesControllers.modifySauce);
 router.delete("/:id", auth, saucesControllers.deleteOneSauce);
