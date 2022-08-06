@@ -71,46 +71,63 @@ exports.likedSauce = (req, res, next) => {
     });
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-            res.status(200).json({ sauce });
+            // res.status(200).json({ sauce });
             console.log(sauce);
+
+            // const likesObj = {
+            //     usersLiked: sauce.usersLiked,
+            //     usersDisliked: sauce.usersDisliked,
+            //     likes: sauce.likes,
+            //     dislikes: sauce.dislikes
+            // }
+            let message
+
             if (like === 1
                 && !sauce.usersLiked.find(el => el === userId)
             ) {
-                if (sauce.usersDisliked.find(el => el === userId)) {
-                    sauce.dislikes -= 1
-                    sauce.usersDisliked = sauce.usersDisliked.filter(el => el != userId);
-                }
+
+                findUserId(sauce.usersDisliked, sauce.dislikes, userId);
                 sauce.usersLiked.push(userId);
-                sauce.likes += 1
-                sauce.save();
+                sauce.likes += 1;
+                message = "évaluée"
             }
 
             if (like === -1
                 && !sauce.usersDisliked.find(el => el === userId)
             ) {
-                if (sauce.usersLiked.find(el => el === userId)) {
-                    sauce.likes -= 1
-                    sauce.usersLiked = sauce.usersLiked.filter(el => el != userId);
-                }
+                findUserId(sauce.usersLiked, sauce.likes, userId)
                 sauce.usersDisliked.push(userId)
                 sauce.dislikes += 1;
-                sauce.save();
+                message = "dévaluée"
 
             }
 
             if (like === 0 && sauce.usersLiked.find(el => el === userId)) {
-                // sauce.likes = 0
                 sauce.likes -= 1
                 sauce.usersLiked = sauce.usersLiked.filter(el => el != userId);
-                sauce.save();
+                message = "évaluation retirée !"
             }
             if (like === 0 && sauce.usersDisliked.find(el => el === userId)) {
-                // sauce.dislikes = 0
                 sauce.dislikes -= 1
                 sauce.usersDisliked = sauce.usersDisliked.filter(el => el != userId);
-                sauce.save();
+                message = "évaluation retirée !"
             }
+            return [sauce, message];
+        })
+        .then(([sauce, message]) => {
+            res.status(200).json({
+                sauce,
+                message
+            });
+            sauce.save();
         })
         .catch(error => res.status(400).json({ error }));
 
+}
+
+const findUserId = (sauceUserLike, sauceLike, userId) => {
+    if (sauceUserLike.find(el => el === userId)) {
+        sauceLike -= 1
+        sauceUserLike = sauceUserLike.filter(el => el != userId);
+    }
 }
