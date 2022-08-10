@@ -1,4 +1,5 @@
 node_modules
 .env
 # exclut toutes les images du dossier "images"
-images/*
+images/*.jpg
+images/*.jpeg
