@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
+require("dotenv").config();
 
 const app = express();
 
@@ -21,12 +22,21 @@ const sauceRoutes = require("./routes/sauce");
 //     console.log("Connexion à mongodb échouée !!")
 // );
 
-// Se connecte à la Base de Données "piiquante" et la crée si elle n'existe pas !
 mongoose.connect(
-    "mongodb://localhost:27017/piiquante",
-    { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("Connexion à mongodb réussie !"))
-    .catch(() => console.log("Connexion à mongodb échouée !!"))
+    `mongodb+srv://${dbUser}:${dbPassword}@cluster0.lsr3jb4.mongodb.net/?retryWrites=true&w=majority`,
+    { useNewUrlParser: true, useUnifiedTopology: true }
+).then(() =>
+    console.log("Connexion à mongodb atlas réussie !")
+).catch(() =>
+    console.log("Connexion à mongodb atlas échouée !!")
+);
+
+// Se connecte à la Base de Données "piiquante" et la crée si elle n'existe pas !
+// mongoose.connect(
+//     "mongodb://localhost:27017/piiquante",
+//     { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then(() => console.log("Connexion à mongodb réussie !"))
+//     .catch(() => console.log("Connexion à mongodb échouée !!"))
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');

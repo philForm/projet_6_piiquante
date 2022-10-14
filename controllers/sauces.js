@@ -31,7 +31,6 @@ exports.displayOneSauce = (req, res, next) => {
         .catch(error => res.status(404).json({ error }));
 };
 
-
 // Supprime une sauce
 exports.deleteOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
