@@ -6,9 +6,6 @@ require("dotenv").config();
 
 /**
  * Création d'un utilisateur
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
  */
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
@@ -25,10 +22,7 @@ exports.signup = (req, res, next) => {
 };
 
 /**
-// Connexion d'un utilisateur
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
+ * Connexion d'un utilisateur
  */
 exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })

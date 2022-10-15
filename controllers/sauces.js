@@ -2,7 +2,9 @@ const fs = require("fs");
 
 const Sauce = require("../models/Sauce");
 
-// Création d'une nouvelle sauce.
+/**
+ * Création d'une nouvelle sauce.
+ */
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce)
     delete sauceObject._id;
@@ -17,21 +19,27 @@ exports.createSauce = (req, res, next) => {
         .catch((error) => res.status(400).json({ error }));
 };
 
-// Affiche toutes les sauces.
+/**
+ * Affiche toutes les sauces.
+ */
 exports.displayAllSauces = (req, res, next) => {
     Sauce.find()
         .then(sauces => res.status(200).json(sauces))
         .catch(error => res.status(400).json({ error }));
 };
 
-// Affiche une seule sauce.
+/**
+ * Affiche une seule sauce.
+ */
 exports.displayOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then(sauce => res.status(200).json(sauce))
         .catch(error => res.status(404).json({ error }));
 };
 
-// Supprime une sauce
+/**
+ * Supprime une sauce
+ */
 exports.deleteOneSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
@@ -45,8 +53,9 @@ exports.deleteOneSauce = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 };
 
-
-// Modifie une sauce.
+/**
+ * Modifie une sauce.
+ */
 exports.modifySauce = (req, res, next) => {
     const sauceObject = req.file ?
         {
@@ -58,7 +67,9 @@ exports.modifySauce = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
-// Voter pour une sauce !
+/**
+ * Voter pour une sauce !
+ */
 exports.likedSauce = (req, res, next) => {
     const likedSauce = req.body
     const { userId, like } = likedSauce
@@ -70,22 +81,14 @@ exports.likedSauce = (req, res, next) => {
     });
     Sauce.findOne({ _id: req.params.id })
         .then((sauce) => {
-            // res.status(200).json({ sauce });
             console.log(sauce);
 
-            // const likesObj = {
-            //     usersLiked: sauce.usersLiked,
-            //     usersDisliked: sauce.usersDisliked,
-            //     likes: sauce.likes,
-            //     dislikes: sauce.dislikes
-            // }
             let message
-
+            // Si like = 1 et si l'utilisateur n'a pas déjà liked la sauce
             if (like === 1
                 && !sauce.usersLiked.find(el => el === userId)
             ) {
-
-                findUserId(sauce.usersDisliked, sauce.dislikes, userId);
+                removeUserIdAndLike(sauce.usersDisliked, sauce.dislikes, userId);
                 sauce.usersLiked.push(userId);
                 sauce.likes += 1;
                 message = "évaluée"
@@ -94,11 +97,10 @@ exports.likedSauce = (req, res, next) => {
             if (like === -1
                 && !sauce.usersDisliked.find(el => el === userId)
             ) {
-                findUserId(sauce.usersLiked, sauce.likes, userId)
+                removeUserIdAndLike(sauce.usersLiked, sauce.likes, userId)
                 sauce.usersDisliked.push(userId)
                 sauce.dislikes += 1;
                 message = "dévaluée"
-
             }
 
             if (like === 0 && sauce.usersLiked.find(el => el === userId)) {
@@ -109,7 +111,7 @@ exports.likedSauce = (req, res, next) => {
             if (like === 0 && sauce.usersDisliked.find(el => el === userId)) {
                 sauce.dislikes -= 1
                 sauce.usersDisliked = sauce.usersDisliked.filter(el => el != userId);
-                message = "évaluation retirée !"
+                message = "dévaluation retirée !"
             }
             return [sauce, message];
         })
@@ -123,10 +125,12 @@ exports.likedSauce = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 
 }
-
-const findUserId = (sauceUserLike, sauceLike, userId) => {
+/**
+ * Si l'utilisateur a déjà mis un like ou dislike, l'information est retirée.
+ */
+const removeUserIdAndLike = (sauceUserLike, sauceLike, userId) => {
     if (sauceUserLike.find(el => el === userId)) {
-        sauceLike -= 1
+        sauceLike -= 1;
         sauceUserLike = sauceUserLike.filter(el => el != userId);
-    }
-}
+    };
+};
