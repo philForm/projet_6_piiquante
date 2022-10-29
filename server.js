@@ -33,13 +33,16 @@ const errorHandler = error => {
     }
 };
 
+// Création du serveur
 const server = http.createServer(app);
 
+// enregistre les erreurs dans le serveur
 server.on('error', errorHandler);
+// enregistre un écouteur d'événement.
 server.on('listening', () => {
     const address = server.address();
     const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
     console.log('Listening on ' + bind);
 });
-
+// serveur en écoute sur le port...
 server.listen(port);

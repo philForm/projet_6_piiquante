@@ -2,23 +2,33 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const securePassword = require("../utils/secure_password")
 require("dotenv").config();
 
 /**
  * Création d'un utilisateur
  */
 exports.signup = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10)
-        .then(hash => {
-            const user = new User({
-                email: req.body.email,
-                password: hash
-            });
-            user.save()
-                .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-                .catch(error => res.status(500).json({ error }));
-        })
-        .catch(error => res.status(500).json({ error }));
+
+    let pass = req.body.password;
+
+    securePassword(pass) ? (
+
+        bcrypt.hash(pass, 10)
+            .then(hash => {
+                const user = new User({
+                    email: req.body.email,
+                    password: hash
+                });
+                user.save()
+                    .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+                    .catch(error => res.status(500).json({ error }));
+            })
+            .catch(error => res.status(500).json({ error }))
+
+    ) : (
+        res.status(401).json({ message: "Le mot de passe n'est pas suffisamment sécurisé !" })
+    );
 };
 
 /**
